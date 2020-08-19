@@ -4,6 +4,7 @@ import os
 import logging
 import random
 import requests
+import time
 
 from Classes.Pokemon import Pokemon
 from enum import Enum
@@ -13,8 +14,10 @@ from math import floor
 CUR_DIR = os.getcwd()
 config = configparser.ConfigParser()
 config.read(f'{CUR_DIR}/config.ini')
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
+MESSAGE_THRESHOLD = 0
+SPAWN_QUEUE = []
 class PokemonGen(Enum):
     """
     A class containing Enums for the various pokemon generations to
@@ -114,3 +117,13 @@ def fetch_pokemon_image(pokemon_name):
     else:
         logging.error(f"Pokemon causing issues: {pokemon_name}")
         return None, False
+
+def auto_spawn_pokemon():
+    global MESSAGE_THRESHOLD, SPAWN_QUEUE
+    MESSAGE_THRESHOLD += 1
+    if  MESSAGE_THRESHOLD >= int(config["DEFAULT"]["messageThreshold"]):
+        MESSAGE_THRESHOLD = 0
+        if len(SPAWN_QUEUE) < int(config["DEFAULT"]["queueSize"]):
+            SPAWN_QUEUE.append(get_rand_pokemon())
+    else:
+        print("+1")

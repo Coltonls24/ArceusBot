@@ -2,13 +2,14 @@ import configparser
 import discord
 import os
 
-from pokemonGen import get_rand_pokemon, replace_chars, fetch_pokemon_image
+from pokemonGen import get_rand_pokemon, replace_chars, fetch_pokemon_image, auto_spawn_pokemon
 
 CUR_DIR = os.getcwd()
 config = configparser.ConfigParser()
 config.read(f'{CUR_DIR}/config.ini')
 
 client = discord.Client()
+messages = 0
 
 @client.event
 async def on_ready():
@@ -26,6 +27,8 @@ async def on_message(message):
         pokemon_img, success = fetch_pokemon_image(pokemon)
         if success:
             await message.channel.send("Who's that pokemon?!", file=discord.File(pokemon_img, "Pokemon.png"))
+    else:
+        auto_spawn_pokemon()
 
 
 client.run(config['AUTH']['token'])
